@@ -1,0 +1,706 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "EnergyMeterCRUDed",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "CRUD"
+    },
+    {
+      "name": "CRUD/channels"
+    },
+    {
+      "name": "CRUD/energy_meter"
+    }
+  ],
+  "paths": {
+    "/api/admin/crud/channels/{id}": {
+      "get": {
+        "summary": "Get channels",
+        "x-apidog-folder": "CRUD/channels",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "CRUD/channels"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/channels"
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848831-run"
+      },
+      "put": {
+        "summary": "Update channels",
+        "x-apidog-folder": "CRUD/channels",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "CRUD/channels"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/channels"
+              },
+              "example": ""
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apidog-ignore-properties": [],
+                  "x-apidog-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848838-run"
+      },
+      "delete": {
+        "summary": "Delete channels",
+        "x-apidog-folder": "CRUD/channels",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "CRUD/channels"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apidog-ignore-properties": [],
+                  "x-apidog-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848840-run"
+      }
+    },
+    "/api/admin/crud/energy_meter/{id}": {
+      "get": {
+        "summary": "Get energy_meter",
+        "x-apidog-folder": "CRUD/energy_meter",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "CRUD/energy_meter"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/energy_meter"
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848832-run"
+      },
+      "put": {
+        "summary": "Update energy_meter",
+        "x-apidog-folder": "CRUD/energy_meter",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "CRUD/energy_meter"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/energy_meter"
+              },
+              "example": ""
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apidog-ignore-properties": [],
+                  "x-apidog-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848841-run"
+      },
+      "delete": {
+        "summary": "Delete energy_meter",
+        "x-apidog-folder": "CRUD/energy_meter",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "CRUD/energy_meter"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apidog-ignore-properties": [],
+                  "x-apidog-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848842-run"
+      }
+    },
+    "/api/admin/crud/energy_meter": {
+      "get": {
+        "summary": "Get all energy_meter",
+        "x-apidog-folder": "CRUD/energy_meter",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "CRUD/energy_meter"
+        ],
+        "parameters": [
+          {
+            "name": "first",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "rowcount",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/energy_meter"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848833-run"
+      },
+      "post": {
+        "summary": "Save energy_meter",
+        "x-apidog-folder": "CRUD/energy_meter",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "CRUD/energy_meter"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/energy_meter"
+              },
+              "example": ""
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/energy_meter"
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848836-run"
+      }
+    },
+    "/api/admin/crud/channels": {
+      "get": {
+        "summary": "Get all channels",
+        "x-apidog-folder": "CRUD/channels",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "CRUD/channels"
+        ],
+        "parameters": [
+          {
+            "name": "first",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "rowcount",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/channels"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848834-run"
+      },
+      "post": {
+        "summary": "Save channels",
+        "x-apidog-folder": "CRUD/channels",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "CRUD/channels"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/channels"
+              },
+              "example": ""
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/channels"
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848835-run"
+      }
+    },
+    "/api/admin/crud/channels/count": {
+      "get": {
+        "summary": "Get channels count",
+        "x-apidog-folder": "CRUD/channels",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "CRUD/channels"
+        ],
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "x-apidog-orders": [
+                    "count"
+                  ],
+                  "required": [
+                    "count"
+                  ],
+                  "x-apidog-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848837-run"
+      }
+    },
+    "/api/admin/crud/energy_meter/count": {
+      "get": {
+        "summary": "Get energy_meter count",
+        "x-apidog-folder": "CRUD/energy_meter",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "CRUD/energy_meter"
+        ],
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "x-apidog-orders": [
+                    "count"
+                  ],
+                  "required": [
+                    "count"
+                  ],
+                  "x-apidog-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848839-run"
+      }
+    },
+    "/api/measurements/report": {
+      "get": {
+        "summary": "report",
+        "x-apidog-folder": "",
+        "x-apidog-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "fromdate",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "todate",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ip",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "details",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "channel",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apidog-ignore-properties": [],
+                  "x-apidog-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apidog": "https://www.apidog.com/web/project/370691/apis/api-3848844-run"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "energy_meter": {
+        "type": "object",
+        "properties": {
+          "asset_name": {
+            "type": "string"
+          },
+          "ip_address": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer"
+          },
+          "time_zone": {
+            "type": "string"
+          },
+          "use_dst": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "x-apidog-orders": [
+          "asset_name",
+          "ip_address",
+          "port",
+          "time_zone",
+          "use_dst",
+          "enabled"
+        ],
+        "required": [
+          "ip_address",
+          "port",
+          "time_zone",
+          "use_dst",
+          "enabled"
+        ],
+        "x-apidog-folder": "CRUD",
+        "x-apidog-ignore-properties": []
+      },
+      "channels": {
+        "type": "object",
+        "properties": {
+          "energy_meter_id": {
+            "type": "string"
+          },
+          "channel": {
+            "type": "integer"
+          },
+          "channel_name": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "x-apidog-orders": [
+          "energy_meter_id",
+          "channel",
+          "channel_name",
+          "enabled"
+        ],
+        "required": [
+          "energy_meter_id",
+          "channel",
+          "enabled"
+        ],
+        "x-apidog-folder": "CRUD",
+        "x-apidog-ignore-properties": []
+      }
+    }
+  },
+  "servers": []
+}

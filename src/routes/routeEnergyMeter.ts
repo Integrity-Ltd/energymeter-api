@@ -1,0 +1,150 @@
+import { Router } from "express";
+import energy_meter from "../models/energy_meter";
+import Joi from "joi";
+import { Database } from "sqlite3";
+import moment from "moment";
+import path from "path";
+import fs from "fs";
+import DBUtils from "../../../energymeter-utils/src/utils/DBUtils";
+const router = Router();
+
+router.get("/", async (req, res) => {
+    let db = new Database(process.env.CONFIG_DB_FILE as string);
+    if (req.query.first && req.query.rowcount) {
+        db.all("select * from energy_meter limit ? offset ?", [parseInt(req.query.rowcount as string), parseInt(req.query.first as string)], (err, rows) => {
+            if (err) {
+                res.send(JSON.stringify({ "error": err.message }));
+            } else {
+                res.send(rows);
+            }
+            db.close();
+        });
+    } else {
+        db.all("select * from energy_meter", (err, rows) => {
+            if (err) {
+                res.send(JSON.stringify({ "error": err.message }));
+            } else {
+                res.send(rows);
+            }
+            db.close();
+        });
+    }
+});
+
+router.get("/count", async (req, res) => {
+    let db = new Database(process.env.CONFIG_DB_FILE as string);
+    db.get("select count(*) as count from energy_meter", (err, rows) => {
+        if (err) {
+            res.send(JSON.stringify({ "error": err.message }));
+        } else {
+            res.send(rows);
+        }
+        db.close();
+    });
+});
+
+router.get("/:id", async (req, res) => {
+    let db = new Database(process.env.CONFIG_DB_FILE as string);
+    db.get("select * from energy_meter where id = ? ", [req.params.id], (err, rows) => {
+        if (err) {
+            res.send(JSON.stringify({ "error": err.message }));
+        } else {
+            res.send(rows);
+        }
+        db.close();
+    });
+});
+
+router.delete("/:id", async (req, res) => {
+    let db = new Database(process.env.CONFIG_DB_FILE as string);
+    db.run("delete from channels where energy_meter_id = ? ", [req.params.id], function (err) {
+        if (err) {
+            res.send(JSON.stringify({ "error": err.message }));
+            db.close();
+        } else {
+            db.run("delete from energy_meter where id = ? ", [req.params.id], function (err) {
+                if (err) {
+                    res.send(JSON.stringify({ "error": err.message }));
+                } else {
+                    res.send(JSON.stringify({ count: this.changes }));
+                }
+                db.close();
+            });
+        }
+    });
+});
+
+router.put("/:id", async (req, res) => {
+    let valid: Joi.ValidationResult = energy_meter.validate(req.body);
+    if (!valid.error) {
+        let db = new Database(process.env.CONFIG_DB_FILE as string);
+        db.run("update energy_meter set asset_name = ?, ip_address = ?, port = ?, time_zone = ?, use_dst = ?, enabled = ? where id = ? ",
+            [
+                req.body.asset_name,
+                req.body.ip_address,
+                req.body.port,
+                req.body.time_zone,
+                req.body.use_dst,
+                req.body.enabled,
+                req.params.id
+            ], function (err) {
+                if (err) {
+                    res.send(JSON.stringify({ "error": err.message }));
+                } else {
+                    res.send(JSON.stringify({ count: this.changes }));
+                }
+                db.close();
+            });
+    } else {
+        res.status(400).send({ message: valid.error });
+    }
+});
+
+router.post("/", async (req, res) => {
+    let valid: Joi.ValidationResult = energy_meter.validate(req.body);
+    if (!valid.error) {
+        let db = new Database(process.env.CONFIG_DB_FILE as string);
+        db.run("insert into energy_meter (asset_name, ip_address, port, time_zone, use_dst, enabled) values (?,?,?,?,?,?)",
+            [
+                req.body.asset_name,
+                req.body.ip_address,
+                req.body.port,
+                req.body.time_zone,
+                req.body.use_dst,
+                req.body.enabled
+            ], async function (err) {
+                if (err) {
+                    res.send(JSON.stringify({ "error": err.message }));
+                } else {
+                    const lastID = this.lastID;
+                    const insertMoment = moment();
+                    const filePath = (process.env.WORKDIR as string);
+                    const subdir = filePath + (filePath.endsWith(path.sep) ? "" : path.sep) + req.body.ip_address;
+                    if (!fs.existsSync(subdir)) {
+                        fs.mkdirSync(subdir, { recursive: true });
+                    }
+                    const dbFile = subdir + path.sep + insertMoment.format("YYYY-MM") + "-monthly.sqlite";
+                    let measurementsDB: Database;
+                    if (!fs.existsSync(dbFile)) {
+                        measurementsDB = new Database(dbFile);
+                        await DBUtils.runQuery(measurementsDB, `CREATE TABLE "Measurements" ("id" INTEGER NOT NULL,"channel" INTEGER,"measured_value" REAL,"recorded_time" INTEGER, PRIMARY KEY("id" AUTOINCREMENT))`, []);
+                    } else {
+                        measurementsDB = new Database(dbFile);
+                    }
+                    let channels: string[] = [];
+                    for (let i: number = 1; i <= 12; i++) {
+                        await DBUtils.runQuery(db, "insert into channels (energy_meter_id, channel, channel_name, enabled) values (?,?,?,?)", [lastID, i, `ch${i}`, true]);
+                        channels.push(i.toString())
+                    }
+                    measurementsDB.close();
+                    DBUtils.getMeasurementsFromEnergyMeter(req.body, channels);
+                    res.send(JSON.stringify({ "lastID": lastID }));
+                }
+                db.close();
+            });
+    } else {
+        res.status(400).send({ message: valid.error });
+    }
+});
+
+export default router;
