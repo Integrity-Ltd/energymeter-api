@@ -8,7 +8,7 @@ import routeChannels from './routes/routeChannels';
 import routeMeasurements from './routes/routeMeasurements'
 import path from 'path';
 
-dotenv.config({ path: path.resolve(__dirname, '../api.env') });
+dotenv.config({ path: path.resolve(__dirname, `../${process.env.NODE_ENV ? process.env.NODE_ENV as string : ""}.env`) });
 const app = express();
 
 const port = process.env.PORT || 8080
