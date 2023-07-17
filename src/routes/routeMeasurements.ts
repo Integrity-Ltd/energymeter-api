@@ -39,7 +39,7 @@ router.get("/report", async (req, res) => {
         timeZone = tzone[0].time_zone;
     }
 
-    let measurements = await getMeasurementsFromDBs(fromDate, toDate, ip, channel);
+    let measurements = await getMeasurementsFromDBs(fromDate.tz(timeZone), toDate.tz(timeZone), ip, channel);
     let result: any[] = [];
     let prevElement: any = {};
     let lastElement: any = {};
@@ -51,16 +51,16 @@ router.get("/report", async (req, res) => {
         if (prevElement[element.channel] == undefined) {
             prevElement[element.channel] = { recorded_time: element.recorded_time, measured_value: element.measured_value, channel: element.channel, diff: 0 };
         } else {
-            const roundedPrevDay = moment.unix(prevElement[element.channel].recorded_time).utc().set("hour", 0).set("minute", 0).set("second", 0);
-            const roundedDay = moment.unix(element.recorded_time).utc().set("hour", 0).set("minute", 0).set("second", 0);
+            const roundedPrevDay = moment.unix(prevElement[element.channel].recorded_time).tz(timeZone).set("hour", 0).set("minute", 0).set("second", 0);
+            const roundedDay = moment.unix(element.recorded_time).tz(timeZone).set("hour", 0).set("minute", 0).set("second", 0);
             const diffDays = roundedDay.diff(roundedPrevDay, "days");
             const isDailyEnabled = isDaily && diffDays >= 1;
 
-            const roundedPrevMonth = moment.unix(prevElement[element.channel].recorded_time).utc().set("date", 1).set("hour", 0).set("minute", 0).set("second", 0);
-            const roundedMonth = moment.unix(element.recorded_time).utc().set("date", 1).set("hour", 0).set("minute", 0).set("second", 0);
+            const roundedPrevMonth = moment.unix(prevElement[element.channel].recorded_time).tz(timeZone).set("date", 1).set("hour", 0).set("minute", 0).set("second", 0);
+            const roundedMonth = moment.unix(element.recorded_time).tz(timeZone).set("date", 1).set("hour", 0).set("minute", 0).set("second", 0);
             const diffMonths = roundedMonth.diff(roundedPrevMonth, "months");
             const isMonthlyEnabled = isMonthly && diffMonths >= 1;
-            let isAddableEntry = isHourlyEnabled || isDailyEnabled || isMonthlyEnabled;
+            isAddableEntry = isHourlyEnabled || isDailyEnabled || isMonthlyEnabled;
             if (isAddableEntry) {
                 prevElement[element.channel] = {
                     recorded_time: element.recorded_time,
@@ -108,7 +108,7 @@ export default router;
 async function getMeasurementsFromDBs(fromDate: moment.Moment, toDate: moment.Moment, ip: string, channel: number): Promise<any[]> {
     let monthlyIterator = moment(fromDate);
     let result: any[] = [];
-    while (monthlyIterator.isBefore(toDate)) {
+    while (monthlyIterator.isBefore(toDate) || monthlyIterator.isSame(toDate)) {
         const filePath = (process.env.WORKDIR as string);
         const dbFile = filePath + (filePath.endsWith(path.sep) ? "" : path.sep) + ip + path.sep + monthlyIterator.format("YYYY-MM") + "-monthly.sqlite";
         if (fs.existsSync(dbFile)) {
@@ -133,29 +133,5 @@ async function getMeasurementsFromDBs(fromDate: moment.Moment, toDate: moment.Mo
         monthlyIterator.add(1, "months");
     }
 
-    if (result.length > 0) {
-        const lastRecordedTime = result[result.length - 1].recorded_time;
-        let nextHour = moment.unix(lastRecordedTime);
-        nextHour.add(1, "hour");
-        const filePath = (process.env.WORKDIR as string);
-        const dbFile = filePath + (filePath.endsWith(path.sep) ? "" : path.sep) + ip + path.sep + nextHour.format("YYYY-MM") + "-monthly.sqlite";
-        if (fs.existsSync(dbFile)) {
-            const db = new Database(dbFile);
-            try {
-                let options = [lastRecordedTime];
-                if (channel) {
-                    options.push(channel);
-                }
-                const firstRecords = await DBUtils.runQuery(db, "SELECT min(id) as id, channel, measured_value, recorded_time FROM measurements where recorded_time > ? " + (channel ? "and channel=?" : "") + " group by channel", options);
-                firstRecords.forEach((element: any) => {
-                    result.push(element);
-                })
-            } catch (err) {
-                console.error(moment().format(), err);
-            } finally {
-                db.close();
-            }
-        }
-    }
     return result;
 }
