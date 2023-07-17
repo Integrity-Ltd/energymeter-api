@@ -110,7 +110,7 @@ async function getMeasurementsFromDBs(fromDate: moment.Moment, toDate: moment.Mo
     let result: any[] = [];
     while (monthlyIterator.isBefore(toDate) || monthlyIterator.isSame(toDate)) {
         const filePath = (process.env.WORKDIR as string);
-        const dbFile = filePath + (filePath.endsWith(path.sep) ? "" : path.sep) + ip + path.sep + monthlyIterator.format("YYYY-MM") + "-monthly.sqlite";
+        const dbFile = path.join(filePath, ip, monthlyIterator.format("YYYY-MM") + "-monthly.sqlite");
         if (fs.existsSync(dbFile)) {
             const db = new Database(dbFile);
             try {
