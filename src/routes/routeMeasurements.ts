@@ -39,7 +39,7 @@ router.get("/report", async (req, res) => {
         timeZone = tzone[0].time_zone;
     }
 
-    let measurements = await getMeasurementsFromDBs(fromDate.tz(timeZone), toDate.tz(timeZone), ip, channel);
+    let measurements = await getMeasurementsFromDBs(fromDate, toDate, ip, channel);
     let result: any[] = [];
     let prevElement: any = {};
     let lastElement: any = {};
