@@ -39,7 +39,12 @@ router.get("/report", async (req, res) => {
         timeZone = tzone[0].time_zone;
     }
 
-    let measurements = await getMeasurementsFromDBs(fromDate, toDate, ip, channel);
+    let measurements: any[];
+    if (fromDate.get("year") < moment().get("year")) {
+        measurements = await getYearlyMeasurementsFromDBs(fromDate, toDate, ip, channel);
+    } else {
+        measurements = await getMeasurementsFromDBs(fromDate, toDate, ip, channel);
+    }
     let result: any[] = [];
     let prevElement: any = {};
     let lastElement: any = {};
@@ -106,7 +111,7 @@ router.get("/report", async (req, res) => {
 export default router;
 
 async function getMeasurementsFromDBs(fromDate: moment.Moment, toDate: moment.Moment, ip: string, channel: number): Promise<any[]> {
-    let monthlyIterator = moment(fromDate);
+    let monthlyIterator = moment(fromDate).set("date", 1).set("hour", 0).set("minute", 0).set("second", 0);
     let result: any[] = [];
     while (monthlyIterator.isBefore(toDate) || monthlyIterator.isSame(toDate)) {
         const filePath = (process.env.WORKDIR as string);
@@ -131,6 +136,33 @@ async function getMeasurementsFromDBs(fromDate: moment.Moment, toDate: moment.Mo
             }
         }
         monthlyIterator.add(1, "months");
+    }
+
+    return result;
+}
+
+async function getYearlyMeasurementsFromDBs(fromDate: moment.Moment, toDate: moment.Moment, ip: string, channel: number): Promise<any[]> {
+    let result: any[] = [];
+    const filePath = (process.env.WORKDIR as string);
+    const dbFile = path.join(filePath, ip, fromDate.format("YYYY") + "-yearly.sqlite");
+    if (fs.existsSync(dbFile)) {
+        const db = new Database(dbFile);
+        try {
+            const fromSec = fromDate.unix();
+            const toSec = toDate.unix();
+            let options = [fromSec, toSec];
+            if (channel) {
+                options.push(channel);
+            }
+            let measurements = await DBUtils.runQuery(db, "select * from measurements where recorded_time between ? and ? " + (channel ? "and channel=?" : "") + " order by recorded_time, channel", options);
+            measurements.forEach((element: any) => {
+                result.push(element);
+            })
+        } catch (err) {
+            console.error(moment().format(), err);
+        } finally {
+            db.close();
+        }
     }
 
     return result;
