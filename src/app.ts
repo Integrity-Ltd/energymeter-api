@@ -32,6 +32,8 @@ router.get("/json", async (req, res) => {
 app.use('/api', router);
 
 
-app.listen(port, async () => {
+const server = app.listen(port, async () => {
     console.log(`App is running at http://localhost:${port}`);
 })
+
+export default { app, server };
