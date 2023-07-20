@@ -6,8 +6,6 @@ import DBUtils from "../../../energymeter-utils/src/utils/DBUtils";
 import fs from "fs";
 import report from "../models/report";
 import Joi from "joi";
-import { time } from "console";
-import { channel } from "diagnostics_channel";
 
 const router = Router();
 
