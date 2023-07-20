@@ -1,23 +1,34 @@
 import request from 'supertest';
 import { StatusCodes } from 'http-status-codes';
 import exportedApp from "../../src/app";
-import { channel } from 'diagnostics_channel';
 
 describe('EnergyMeter integration tests', () => {
     let lastID: number;
     let energy_meter_id: number;
-    beforeAll(async () => { })
+    beforeAll(async () => {
+        const energymeter = {
+            asset_name: "test1",
+            ip_address: "192.168.1.239",
+            port: 50003,
+            time_zone: "Europe/Budapest",
+            use_dst: true,
+            enabled: false
+        };
 
-    it('Create channel', async () => {
         await request(exportedApp.app)
-            .get("/api/admin/crud/energy_meter")
+            .post("/api/admin/crud/energy_meter")
+            .send(energymeter)
             .set('Accept', 'application/json')
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
-                if (parsedObj.length > 0) {
-                    energy_meter_id = parsedObj[0].id;
-                }
+                energy_meter_id = parsedObj.lastID;
+                expect(parsedObj.lastID).toBeDefined();
             })
+            .expect(StatusCodes.OK);
+
+    })
+
+    test('Create channel', async () => {
         const chennelObj = {
             channel_name: "testCH1",
             channel: 1,
@@ -37,7 +48,7 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    it('Request channels list', async () => {
+    test('Request channels list', async () => {
         await request(exportedApp.app)
             .get('/api/admin/crud/channels/')
             .set('Accept', 'application/json')
@@ -49,7 +60,7 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    it('Update channel', async () => {
+    test('Update channel', async () => {
         const chennelObj = {
             channel_name: "testCH12",
             channel: 1,
@@ -79,7 +90,7 @@ describe('EnergyMeter integration tests', () => {
     })
 
 
-    it('Delete channel', async () => {
+    test('Delete channel', async () => {
         await request(exportedApp.app)
             .delete('/api/admin/crud/channels/' + lastID)
             .set('Accept', 'application/json')
@@ -90,7 +101,15 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    afterAll(() => {
+    afterAll(async () => {
+        await request(exportedApp.app)
+            .delete('/api/admin/crud/energy_meter/' + energy_meter_id)
+            .set('Accept', 'application/json')
+            .expect((res: request.Response) => {
+                const parsedObj = JSON.parse(res.text);
+                expect(parsedObj.count).toEqual(1);
+            })
+            .expect(StatusCodes.OK);
         exportedApp.server.close();
     })
 })
