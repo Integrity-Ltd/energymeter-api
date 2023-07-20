@@ -1,26 +1,33 @@
-import * as express from 'express';
 import request from 'supertest';
 import { StatusCodes } from 'http-status-codes';
-import { rejects } from 'assert';
-import { Server } from 'http';
 import exportedApp from "../../src/app";
+import { channel } from 'diagnostics_channel';
 
 describe('EnergyMeter integration tests', () => {
     let lastID: number;
+    let energy_meter_id: number;
     beforeAll(async () => { })
 
-    it('Create energymeter', async () => {
-        const energymeter = {
-            asset_name: "test1",
-            ip_address: "192.168.1.239",
-            port: 50003,
-            time_zone: "Europe/Budapest",
-            use_dst: true,
-            enabled: false
-        }
+    it('Create channel', async () => {
         await request(exportedApp.app)
-            .post('/api/admin/crud/energy_meter/')
-            .send(energymeter)
+            .get("/api/admin/crud/energy_meter")
+            .set('Accept', 'application/json')
+            .expect((res: request.Response) => {
+                const parsedObj = JSON.parse(res.text);
+                if (parsedObj.length > 0) {
+                    energy_meter_id = parsedObj[0].id;
+                }
+            })
+        const chennelObj = {
+            channel_name: "testCH1",
+            channel: 1,
+            energy_meter_id: energy_meter_id,
+            enabled: false
+        };
+
+        await request(exportedApp.app)
+            .post('/api/admin/crud/channels/')
+            .send(chennelObj)
             .set('Accept', 'application/json')
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
@@ -30,9 +37,9 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    it('Request energymeters list', async () => {
+    it('Request channels list', async () => {
         await request(exportedApp.app)
-            .get('/api/admin/crud/energy_meter/')
+            .get('/api/admin/crud/channels/')
             .set('Accept', 'application/json')
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
@@ -42,18 +49,16 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    it('Update energymeter', async () => {
-        const energymeter = {
-            asset_name: "test12",
-            ip_address: "192.168.1.239",
-            port: 50003,
-            time_zone: "Europe/Budapest",
-            use_dst: true,
+    it('Update channel', async () => {
+        const chennelObj = {
+            channel_name: "testCH12",
+            channel: 1,
+            energy_meter_id: energy_meter_id,
             enabled: false
-        }
+        };
         await request(exportedApp.app)
-            .put('/api/admin/crud/energy_meter/' + lastID)
-            .send(energymeter)
+            .put('/api/admin/crud/channels/' + lastID)
+            .send(chennelObj)
             .set('Accept', 'application/json')
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
@@ -63,28 +68,20 @@ describe('EnergyMeter integration tests', () => {
     })
 
     it('Get specified energymeter', async () => {
-        const energymeter = {
-            asset_name: "test12",
-            ip_address: "192.168.1.239",
-            port: 50003,
-            time_zone: "Europe/Budapest",
-            use_dst: true,
-            enabled: false
-        }
         await request(exportedApp.app)
-            .get('/api/admin/crud/energy_meter/' + lastID)
+            .get('/api/admin/crud/channels/' + lastID)
             .set('Accept', 'application/json')
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
-                expect(parsedObj.asset_name).toEqual("test12");
+                expect(parsedObj.channel_name).toEqual("testCH12");
             })
             .expect(StatusCodes.OK);
     })
 
 
-    it('Delete energymeter', async () => {
+    it('Delete channel', async () => {
         await request(exportedApp.app)
-            .delete('/api/admin/crud/energy_meter/' + lastID)
+            .delete('/api/admin/crud/channels/' + lastID)
             .set('Accept', 'application/json')
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
