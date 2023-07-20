@@ -48,6 +48,17 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
+    it('Channels count', async () => {
+        await request(exportedApp.app)
+            .get('/api/admin/crud/channels/count')
+            .set('Accept', 'application/json')
+            .expect((res: request.Response) => {
+                const parsedObj = JSON.parse(res.text);
+                expect(parsedObj.count).toBeGreaterThanOrEqual(1);
+            })
+            .expect(StatusCodes.OK);
+    })
+
     test('Request channels list', async () => {
         await request(exportedApp.app)
             .get('/api/admin/crud/channels/')

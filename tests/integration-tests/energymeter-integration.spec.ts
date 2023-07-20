@@ -27,6 +27,17 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
+    it('Energymeters count', async () => {
+        await request(exportedApp.app)
+            .get('/api/admin/crud/energy_meter/count')
+            .set('Accept', 'application/json')
+            .expect((res: request.Response) => {
+                const parsedObj = JSON.parse(res.text);
+                expect(parsedObj.count).toBeGreaterThanOrEqual(1);
+            })
+            .expect(StatusCodes.OK);
+    })
+
     it('Request energymeters list', async () => {
         await request(exportedApp.app)
             .get('/api/admin/crud/energy_meter/')
