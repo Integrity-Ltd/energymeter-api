@@ -2,7 +2,7 @@ import request from 'supertest';
 import { StatusCodes } from 'http-status-codes';
 import exportedApp from "../../src/app";
 
-describe('EnergyMeter integration tests', () => {
+describe("EnergyMeter integration tests", () => {
     let lastID: number;
     let energy_meter_id: number;
     beforeAll(async () => {
@@ -18,7 +18,7 @@ describe('EnergyMeter integration tests', () => {
         await request(exportedApp.app)
             .post("/api/admin/crud/energy_meter")
             .send(energymeter)
-            .set('Accept', 'application/json')
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 energy_meter_id = parsedObj.lastID;
@@ -28,7 +28,7 @@ describe('EnergyMeter integration tests', () => {
 
     })
 
-    test('Create channel', async () => {
+    test("Create channel", async () => {
         const chennelObj = {
             channel_name: "testCH1",
             channel: 1,
@@ -37,9 +37,9 @@ describe('EnergyMeter integration tests', () => {
         };
 
         await request(exportedApp.app)
-            .post('/api/admin/crud/channels/')
+            .post("/api/admin/crud/channels/")
             .send(chennelObj)
-            .set('Accept', 'application/json')
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 lastID = parsedObj.lastID;
@@ -48,10 +48,10 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    it('Channels count', async () => {
+    it("Channels count", async () => {
         await request(exportedApp.app)
-            .get('/api/admin/crud/channels/count')
-            .set('Accept', 'application/json')
+            .get("/api/admin/crud/channels/count")
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 expect(parsedObj.count).toBeGreaterThanOrEqual(1);
@@ -59,10 +59,10 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    test('Request channels list', async () => {
+    test("Request channels list", async () => {
         await request(exportedApp.app)
-            .get('/api/admin/crud/channels/')
-            .set('Accept', 'application/json')
+            .get("/api/admin/crud/channels/")
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 expect(parsedObj.length).toBeGreaterThanOrEqual(1);
@@ -71,7 +71,7 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    test('Update channel', async () => {
+    test("Update channel", async () => {
         const chennelObj = {
             channel_name: "testCH12",
             channel: 1,
@@ -79,9 +79,9 @@ describe('EnergyMeter integration tests', () => {
             enabled: false
         };
         await request(exportedApp.app)
-            .put('/api/admin/crud/channels/' + lastID)
+            .put("/api/admin/crud/channels/" + lastID)
             .send(chennelObj)
-            .set('Accept', 'application/json')
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 expect(parsedObj.count).toEqual(1);
@@ -89,10 +89,10 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    it('Get specified energymeter', async () => {
+    it("Get specified energymeter", async () => {
         await request(exportedApp.app)
-            .get('/api/admin/crud/channels/' + lastID)
-            .set('Accept', 'application/json')
+            .get("/api/admin/crud/channels/" + lastID)
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 expect(parsedObj.channel_name).toEqual("testCH12");
@@ -101,10 +101,10 @@ describe('EnergyMeter integration tests', () => {
     })
 
 
-    test('Delete channel', async () => {
+    test("Delete channel", async () => {
         await request(exportedApp.app)
-            .delete('/api/admin/crud/channels/' + lastID)
-            .set('Accept', 'application/json')
+            .delete("/api/admin/crud/channels/" + lastID)
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 expect(parsedObj.count).toEqual(1);
@@ -114,8 +114,8 @@ describe('EnergyMeter integration tests', () => {
 
     afterAll(async () => {
         await request(exportedApp.app)
-            .delete('/api/admin/crud/energy_meter/' + energy_meter_id)
-            .set('Accept', 'application/json')
+            .delete("/api/admin/crud/energy_meter/" + energy_meter_id)
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 expect(parsedObj.count).toEqual(1);

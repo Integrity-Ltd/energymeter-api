@@ -1,12 +1,12 @@
-import request from 'supertest';
-import { StatusCodes } from 'http-status-codes';
+import request from "supertest";
+import { StatusCodes } from "http-status-codes";
 import exportedApp from "../../src/app";
 
-describe('EnergyMeter integration tests', () => {
+describe("EnergyMeter integration tests", () => {
     let lastID: number;
     beforeAll(async () => { })
 
-    it('Create energymeter', async () => {
+    it("Create energymeter", async () => {
         const energymeter = {
             asset_name: "test1",
             ip_address: "192.168.1.239",
@@ -16,9 +16,9 @@ describe('EnergyMeter integration tests', () => {
             enabled: false
         };
         await request(exportedApp.app)
-            .post('/api/admin/crud/energy_meter/')
+            .post("/api/admin/crud/energy_meter/")
             .send(energymeter)
-            .set('Accept', 'application/json')
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 lastID = parsedObj.lastID;
@@ -27,10 +27,10 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    it('Energymeters count', async () => {
+    it("Energymeters count", async () => {
         await request(exportedApp.app)
-            .get('/api/admin/crud/energy_meter/count')
-            .set('Accept', 'application/json')
+            .get("/api/admin/crud/energy_meter/count")
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 expect(parsedObj.count).toBeGreaterThanOrEqual(1);
@@ -38,10 +38,10 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    it('Request energymeters list', async () => {
+    it("Request energymeters list", async () => {
         await request(exportedApp.app)
-            .get('/api/admin/crud/energy_meter/')
-            .set('Accept', 'application/json')
+            .get("/api/admin/crud/energy_meter/")
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 expect(parsedObj.length).toBeGreaterThanOrEqual(1);
@@ -50,7 +50,7 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    it('Update energymeter', async () => {
+    it("Update energymeter", async () => {
         const energymeter = {
             asset_name: "test12",
             ip_address: "192.168.1.239",
@@ -60,9 +60,9 @@ describe('EnergyMeter integration tests', () => {
             enabled: false
         }
         await request(exportedApp.app)
-            .put('/api/admin/crud/energy_meter/' + lastID)
+            .put("/api/admin/crud/energy_meter/" + lastID)
             .send(energymeter)
-            .set('Accept', 'application/json')
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 expect(parsedObj.count).toEqual(1);
@@ -70,10 +70,10 @@ describe('EnergyMeter integration tests', () => {
             .expect(StatusCodes.OK);
     })
 
-    it('Get specified energymeter', async () => {
+    it("Get specified energymeter", async () => {
         await request(exportedApp.app)
-            .get('/api/admin/crud/energy_meter/' + lastID)
-            .set('Accept', 'application/json')
+            .get("/api/admin/crud/energy_meter/" + lastID)
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 expect(parsedObj.asset_name).toEqual("test12");
@@ -82,10 +82,10 @@ describe('EnergyMeter integration tests', () => {
     })
 
 
-    it('Delete energymeter', async () => {
+    it("Delete energymeter", async () => {
         await request(exportedApp.app)
-            .delete('/api/admin/crud/energy_meter/' + lastID)
-            .set('Accept', 'application/json')
+            .delete("/api/admin/crud/energy_meter/" + lastID)
+            .set("Accept", "application/json")
             .expect((res: request.Response) => {
                 const parsedObj = JSON.parse(res.text);
                 expect(parsedObj.count).toEqual(1);
