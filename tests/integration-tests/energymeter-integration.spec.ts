@@ -6,6 +6,24 @@ describe("EnergyMeter integration tests", () => {
     let lastID: number;
     beforeAll(async () => { })
 
+
+    it("Create unfilled energymeter", async () => {
+        const energymeter = {
+            asset_name: "test1",
+            ip_address: "192.168.1.239",
+            enabled: false
+        };
+        await request(exportedApp.app)
+            .post("/api/admin/crud/energy_meter/")
+            .send(energymeter)
+            .set("Accept", "application/json")
+            .expect((res: request.Response) => {
+                const parsedObj = JSON.parse(res.text);
+                expect(parsedObj.message).toBeDefined();
+            })
+            .expect(StatusCodes.BAD_REQUEST);
+    })
+
     it("Create energymeter", async () => {
         const energymeter = {
             asset_name: "test1",
