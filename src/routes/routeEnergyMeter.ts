@@ -57,15 +57,23 @@ router.get("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
     let db = new Database(process.env.CONFIG_DB_FILE as string);
-    db.run("delete from channels where energy_meter_id = ? ", [req.params.id], function (err) {
+    db.run("delete from channels where energy_meter_id = ? ", [req.params.id], async function (err) {
         if (err) {
             res.send(JSON.stringify({ "error": err.message }));
             db.close();
         } else {
+            let path = "";
+            const row = await DBUtils.runQuery(db, "select ip_address from energy_meter where id = ?", [req.params.id]);
+            if (row && row.length > 0) {
+                path = DBUtils.getDBFilePath(row[0].ip_address);
+            }
             db.run("delete from energy_meter where id = ? ", [req.params.id], function (err) {
                 if (err) {
                     res.send(JSON.stringify({ "error": err.message }));
                 } else {
+                    if (fs.existsSync(path)) {
+                        fs.rmdirSync(path, { recursive: true });
+                    }
                     res.send(JSON.stringify({ count: this.changes }));
                 }
                 db.close();
