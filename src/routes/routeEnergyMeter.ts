@@ -137,7 +137,7 @@ router.post("/", async (req, res) => {
                         channels.push(i.toString())
                     }
                     measurementsDB.close();
-                    DBUtils.getMeasurementsFromEnergyMeter(req.body, channels);
+                    await DBUtils.getMeasurementsFromEnergyMeter(moment(), req.body, channels);
                     res.send(JSON.stringify({ "lastID": lastID }));
                 }
                 db.close();
