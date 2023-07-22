@@ -125,25 +125,29 @@ router.post("/", async (req, res) => {
                     const lastID = this.lastID;
                     const insertMoment = moment();
                     const filePath = (process.env.WORKDIR as string);
-                    const subdir = filePath + (filePath.endsWith(path.sep) ? "" : path.sep) + req.body.ip_address;
+                    const subdir = path.join(filePath, req.body.ip_address);
                     if (!fs.existsSync(subdir)) {
                         fs.mkdirSync(subdir, { recursive: true });
                     }
-                    const dbFile = subdir + path.sep + insertMoment.format("YYYY-MM") + "-monthly.sqlite";
+                    const dbFile = path.join(subdir, insertMoment.format("YYYY-MM") + "-monthly.sqlite");
                     let measurementsDB: Database;
-                    if (!fs.existsSync(dbFile)) {
-                        measurementsDB = new Database(dbFile);
-                        await DBUtils.runQuery(measurementsDB, `CREATE TABLE "Measurements" ("id" INTEGER NOT NULL,"channel" INTEGER,"measured_value" REAL,"recorded_time" INTEGER, PRIMARY KEY("id" AUTOINCREMENT))`, []);
-                    } else {
-                        measurementsDB = new Database(dbFile);
+                    try {
+                        if (!fs.existsSync(dbFile)) {
+                            measurementsDB = new Database(dbFile);
+                            await DBUtils.runQuery(measurementsDB, `CREATE TABLE "Measurements" ("id" INTEGER NOT NULL,"channel" INTEGER,"measured_value" REAL,"recorded_time" INTEGER, PRIMARY KEY("id" AUTOINCREMENT))`, []);
+                        } else {
+                            measurementsDB = new Database(dbFile);
+                        }
+                        let channels: string[] = [];
+                        for (let i: number = 1; i <= 12; i++) {
+                            await DBUtils.runQuery(db, "insert into channels (energy_meter_id, channel, channel_name, enabled) values (?,?,?,?)", [lastID, i, `ch${i}`, true]);
+                            channels.push(i.toString())
+                        }
+                        measurementsDB.close();
+                        await DBUtils.getMeasurementsFromEnergyMeter(moment(), req.body, channels);
+                    } catch (err) {
+                        console.error(moment().format(), err);
                     }
-                    let channels: string[] = [];
-                    for (let i: number = 1; i <= 12; i++) {
-                        await DBUtils.runQuery(db, "insert into channels (energy_meter_id, channel, channel_name, enabled) values (?,?,?,?)", [lastID, i, `ch${i}`, true]);
-                        channels.push(i.toString())
-                    }
-                    measurementsDB.close();
-                    await DBUtils.getMeasurementsFromEnergyMeter(moment(), req.body, channels);
                     res.send(JSON.stringify({ "lastID": lastID }));
                 }
                 db.close();
