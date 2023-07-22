@@ -78,13 +78,12 @@ router.put("/:id", async (req, res) => {
     let valid: Joi.ValidationResult = energy_meter.validate(req.body);
     if (!valid.error) {
         let db = new Database(process.env.CONFIG_DB_FILE as string);
-        db.run("update energy_meter set asset_name = ?, ip_address = ?, port = ?, time_zone = ?, use_dst = ?, enabled = ? where id = ? ",
+        db.run("update energy_meter set asset_name = ?, ip_address = ?, port = ?, time_zone = ?, enabled = ? where id = ? ",
             [
                 req.body.asset_name,
                 req.body.ip_address,
                 req.body.port,
                 req.body.time_zone,
-                req.body.use_dst,
                 req.body.enabled,
                 req.params.id
             ], function (err) {
@@ -104,13 +103,12 @@ router.post("/", async (req, res) => {
     let valid: Joi.ValidationResult = energy_meter.validate(req.body);
     if (!valid.error) {
         let db = new Database(process.env.CONFIG_DB_FILE as string);
-        db.run("insert into energy_meter (asset_name, ip_address, port, time_zone, use_dst, enabled) values (?,?,?,?,?,?)",
+        db.run("insert into energy_meter (asset_name, ip_address, port, time_zone, enabled) values (?,?,?,?,?)",
             [
                 req.body.asset_name,
                 req.body.ip_address,
                 req.body.port,
                 req.body.time_zone,
-                req.body.use_dst,
                 req.body.enabled
             ], async function (err) {
                 if (err) {

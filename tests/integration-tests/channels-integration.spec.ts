@@ -2,16 +2,16 @@ import request from 'supertest';
 import { StatusCodes } from 'http-status-codes';
 import exportedApp from "../../src/app";
 
+jest.setTimeout(60000);
 describe("EnergyMeter integration tests", () => {
     let lastID: number;
     let energy_meter_id: number;
     beforeAll(async () => {
         const energymeter = {
             asset_name: "test1",
-            ip_address: "192.168.1.239",
+            ip_address: "192.168.1.237",
             port: 50003,
             time_zone: "Europe/Budapest",
-            use_dst: true,
             enabled: false
         };
 

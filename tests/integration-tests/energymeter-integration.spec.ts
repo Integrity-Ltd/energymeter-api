@@ -2,12 +2,13 @@ import request from "supertest";
 import { StatusCodes } from "http-status-codes";
 import exportedApp from "../../src/app";
 
+jest.setTimeout(60000);
 describe("EnergyMeter integration tests", () => {
     let lastID: number;
     beforeAll(async () => { })
 
 
-    it("Create unfilled energymeter", async () => {
+    test("Create unfilled energymeter", async () => {
         const energymeter = {
             asset_name: "test1",
             ip_address: "192.168.1.239",
@@ -24,13 +25,12 @@ describe("EnergyMeter integration tests", () => {
             .expect(StatusCodes.BAD_REQUEST);
     })
 
-    it("Create energymeter", async () => {
+    test("Create energymeter", async () => {
         const energymeter = {
             asset_name: "test1",
-            ip_address: "192.168.1.239",
+            ip_address: "192.168.1.237",
             port: 50003,
             time_zone: "Europe/Budapest",
-            use_dst: true,
             enabled: false
         };
         await request(exportedApp.app)
@@ -45,7 +45,7 @@ describe("EnergyMeter integration tests", () => {
             .expect(StatusCodes.OK);
     })
 
-    it("Energymeters count", async () => {
+    test("Energymeters count", async () => {
         await request(exportedApp.app)
             .get("/api/admin/crud/energy_meter/count")
             .set("Accept", "application/json")
@@ -56,7 +56,7 @@ describe("EnergyMeter integration tests", () => {
             .expect(StatusCodes.OK);
     })
 
-    it("Request energymeters list", async () => {
+    test("Request energymeters list", async () => {
         await request(exportedApp.app)
             .get("/api/admin/crud/energy_meter/")
             .set("Accept", "application/json")
@@ -68,13 +68,12 @@ describe("EnergyMeter integration tests", () => {
             .expect(StatusCodes.OK);
     })
 
-    it("Update energymeter", async () => {
+    test("Update energymeter", async () => {
         const energymeter = {
             asset_name: "test12",
             ip_address: "192.168.1.239",
             port: 50003,
             time_zone: "Europe/Budapest",
-            use_dst: true,
             enabled: false
         }
         await request(exportedApp.app)
@@ -88,7 +87,7 @@ describe("EnergyMeter integration tests", () => {
             .expect(StatusCodes.OK);
     })
 
-    it("Get specified energymeter", async () => {
+    test("Get specified energymeter", async () => {
         await request(exportedApp.app)
             .get("/api/admin/crud/energy_meter/" + lastID)
             .set("Accept", "application/json")
@@ -100,7 +99,7 @@ describe("EnergyMeter integration tests", () => {
     })
 
 
-    it("Delete energymeter", async () => {
+    test("Delete energymeter", async () => {
         await request(exportedApp.app)
             .delete("/api/admin/crud/energy_meter/" + lastID)
             .set("Accept", "application/json")
