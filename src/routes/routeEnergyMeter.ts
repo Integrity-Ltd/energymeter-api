@@ -72,7 +72,11 @@ router.delete("/:id", async (req, res) => {
                     res.send(JSON.stringify({ "error": err.message }));
                 } else {
                     if (fs.existsSync(path)) {
-                        fs.rmdirSync(path, { recursive: true });
+                        try {
+                            fs.rmSync(path, { recursive: true });
+                        } catch (err) {
+                            console.error(err);
+                        }
                     }
                     res.send(JSON.stringify({ count: this.changes }));
                 }
