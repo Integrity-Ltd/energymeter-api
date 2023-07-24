@@ -127,6 +127,8 @@ router.post("/", async (req, res) => {
                         res.send(JSON.stringify({ "error": err.message }));
                     } else {
                         const lastID = this.lastID;
+                        let message: any[] = [];
+                        message.push({ lastID: lastID });
                         const insertMoment = moment();
                         const filePath = (process.env.WORKDIR as string);
                         const subdir = path.join(filePath, req.body.ip_address);
@@ -151,8 +153,12 @@ router.post("/", async (req, res) => {
                             await DBUtils.getMeasurementsFromEnergyMeter(moment(), req.body, channels);
                         } catch (err) {
                             console.error(moment().format(), err);
+                            if (err) {
+                                message.push({ message: err.toString() });
+                            }
                         }
-                        res.send(JSON.stringify({ "lastID": lastID }));
+
+                        res.send(JSON.stringify(message));
                     }
                     db.close();
                 });
