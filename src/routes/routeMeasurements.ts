@@ -9,6 +9,9 @@ import Joi from "joi";
 
 const router = Router();
 
+/**
+ * Report measurements
+ */
 router.get("/report", async (req, res) => {
     let valid: Joi.ValidationResult = report.validate(req.query);
 
@@ -41,7 +44,7 @@ router.get("/report", async (req, res) => {
     if (fromDate.get("year") < moment().get("year")) {
         measurements = await getYearlyMeasurementsFromDBs(fromDate, toDate, ip, channel);
     } else {
-        measurements = await getMeasurementsFromDBs(fromDate, toDate, ip, channel);
+        measurements = await DBUtils.getMeasurementsFromDBs(fromDate, toDate, ip, channel);
     }
     let result: any[] = [];
     let prevElement: any = {};
@@ -106,39 +109,6 @@ router.get("/report", async (req, res) => {
     res.send(result);
 });
 
-export default router;
-
-async function getMeasurementsFromDBs(fromDate: moment.Moment, toDate: moment.Moment, ip: string, channel: number): Promise<any[]> {
-    let monthlyIterator = moment(fromDate).set("date", 1).set("hour", 0).set("minute", 0).set("second", 0);
-    let result: any[] = [];
-    while (monthlyIterator.isBefore(toDate) || monthlyIterator.isSame(toDate)) {
-        const filePath = (process.env.WORKDIR as string);
-        const dbFile = path.join(filePath, ip, monthlyIterator.format("YYYY-MM") + "-monthly.sqlite");
-        if (fs.existsSync(dbFile)) {
-            const db = new Database(dbFile);
-            try {
-                const fromSec = fromDate.unix();
-                const toSec = toDate.unix();
-                let options = [fromSec, toSec];
-                if (channel) {
-                    options.push(channel);
-                }
-                let measurements = await DBUtils.runQuery(db, "select * from measurements where recorded_time between ? and ? " + (channel ? "and channel=?" : "") + " order by recorded_time, channel", options);
-                measurements.forEach((element: any) => {
-                    result.push(element);
-                })
-            } catch (err) {
-                console.error(moment().format(), err);
-            } finally {
-                db.close();
-            }
-        }
-        monthlyIterator.add(1, "months");
-    }
-
-    return result;
-}
-
 async function getYearlyMeasurementsFromDBs(fromDate: moment.Moment, toDate: moment.Moment, ip: string, channel: number): Promise<any[]> {
     let result: any[] = [];
     const filePath = (process.env.WORKDIR as string);
@@ -148,11 +118,11 @@ async function getYearlyMeasurementsFromDBs(fromDate: moment.Moment, toDate: mom
         try {
             const fromSec = fromDate.unix();
             const toSec = toDate.unix();
-            let options = [fromSec, toSec];
+            let filters = [fromSec, toSec];
             if (channel) {
-                options.push(channel);
+                filters.push(channel);
             }
-            let measurements = await DBUtils.runQuery(db, "select * from measurements where recorded_time between ? and ? " + (channel ? "and channel=?" : "") + " order by recorded_time, channel", options);
+            let measurements = await DBUtils.runQuery(db, "select * from measurements where recorded_time between ? and ? " + (channel ? "and channel=?" : "") + " order by recorded_time, channel", filters);
             measurements.forEach((element: any) => {
                 result.push(element);
             })
@@ -165,3 +135,5 @@ async function getYearlyMeasurementsFromDBs(fromDate: moment.Moment, toDate: mom
 
     return result;
 }
+
+export default router;
