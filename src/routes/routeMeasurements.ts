@@ -21,16 +21,9 @@ router.get("/report", async (req, res) => {
         return;
     }
 
-    const fromDate = moment(req.query.fromdate as string, "YYYY-MM-DD");
-    const toDate = moment(req.query.todate as string, "YYYY-MM-DD");
     const ip = req.query.ip as string;
     const details = req.query.details as string;
     const channel = parseInt(req.query.channel as string);
-
-    if (!fromDate.isBefore(toDate)) {
-        res.status(400).send({ err: "invalid date range" });
-        return;
-    }
 
     const configDB = new Database(process.env.CONFIG_DB_FILE as string);
 
@@ -38,6 +31,13 @@ router.get("/report", async (req, res) => {
     const tzone = await DBUtils.runQuery(configDB, "select time_zone from energy_meter where ip_address=? and enabled = 1", [ip]);
     if (tzone.length > 0) {
         timeZone = tzone[0].time_zone;
+    }
+    const fromDate = moment.tz(req.query.fromdate as string, "YYYY-MM-DD", timeZone);
+    const toDate = moment.tz(req.query.todate as string, "YYYY-MM-DD", timeZone);
+
+    if (!fromDate.isBefore(toDate)) {
+        res.status(400).send({ err: "invalid date range" });
+        return;
     }
 
     let measurements: any[];
