@@ -8,6 +8,9 @@ import fs from "fs";
 import DBUtils from "../../../energymeter-utils/src/utils/DBUtils";
 const router = Router();
 
+/**
+ * Get all powermeter from DB
+ */
 router.get("/", async (req, res) => {
     let db = new Database(process.env.CONFIG_DB_FILE as string);
     if (req.query.first && req.query.rowcount) {
@@ -31,6 +34,9 @@ router.get("/", async (req, res) => {
     }
 });
 
+/**
+ * Get count of powermeter
+ */
 router.get("/count", async (req, res) => {
     let db = new Database(process.env.CONFIG_DB_FILE as string);
     db.get("select count(*) as count from energy_meter", (err, rows) => {
@@ -43,6 +49,9 @@ router.get("/count", async (req, res) => {
     });
 });
 
+/**
+ * Get powermeter by ID
+ */
 router.get("/:id", async (req, res) => {
     let db = new Database(process.env.CONFIG_DB_FILE as string);
     db.get("select * from energy_meter where id = ? ", [req.params.id], (err, rows) => {
@@ -55,6 +64,9 @@ router.get("/:id", async (req, res) => {
     });
 });
 
+/**
+ * Delete powermeter by ID
+ */
 router.delete("/:id", async (req, res) => {
     let db = new Database(process.env.CONFIG_DB_FILE as string);
     db.run("delete from channels where energy_meter_id = ? ", [req.params.id], async function (err) {
@@ -86,6 +98,9 @@ router.delete("/:id", async (req, res) => {
     });
 });
 
+/**
+ * Update powermeter by ID
+ */
 router.put("/:id", async (req, res) => {
     let valid: Joi.ValidationResult = energy_meter.validate(req.body);
     if (!valid.error) {
@@ -111,6 +126,9 @@ router.put("/:id", async (req, res) => {
     }
 });
 
+/**
+ * Create powermeter
+ */
 router.post("/", async (req, res) => {
     let valid: Joi.ValidationResult = energy_meter.validate(req.body);
     if (!valid.error) {

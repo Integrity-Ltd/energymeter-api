@@ -1,5 +1,11 @@
 import Joi from "joi";
 
+/**
+ * Validate powermeter with Joi
+ * 
+ * @param energy_meter the powermeter object to validate 
+ * @returns true if validation successfully done
+ */
 const validate = (energy_meter: object): Joi.ValidationResult => {
     const schema = Joi.object().keys({
         asset_name: Joi.string(),

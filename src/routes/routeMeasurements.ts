@@ -50,6 +50,15 @@ router.get("/report", async (req, res) => {
     res.send(result);
 });
 
+/**
+ * Get monthly measurements from previous year
+ * 
+ * @param fromDate from date
+ * @param toDate to date
+ * @param ip IP address of powermeter
+ * @param channel channel of powermeter (use -1 for all)
+ * @returns the array of measurements
+ */
 async function getYearlyMeasurementsFromDBs(fromDate: moment.Moment, toDate: moment.Moment, ip: string, channel: number): Promise<any[]> {
     let result: any[] = [];
     const filePath = (process.env.WORKDIR as string);

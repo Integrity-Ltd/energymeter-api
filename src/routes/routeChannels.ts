@@ -4,6 +4,9 @@ import Joi from "joi";
 import { Database } from "sqlite3";
 const router = Router();
 
+/**
+ * Get all channels
+ */
 router.get("/", async (req, res) => {
     let db = new Database(process.env.CONFIG_DB_FILE as string);
     if (req.query.first && req.query.rowcount) {
@@ -43,6 +46,9 @@ router.get("/", async (req, res) => {
     }
 });
 
+/**
+ * Get all channels count
+ */
 router.get("/count", async (req, res) => {
     let db = new Database(process.env.CONFIG_DB_FILE as string);
     db.get("select count(*) as count from channels", (err, rows) => {
@@ -55,6 +61,9 @@ router.get("/count", async (req, res) => {
     });
 });
 
+/**
+ * Get channel by ID
+ */
 router.get("/:id", async (req, res) => {
     let db = new Database(process.env.CONFIG_DB_FILE as string);
     db.get("select * from channels where id = ? ", [req.params.id], (err, rows) => {
@@ -67,6 +76,9 @@ router.get("/:id", async (req, res) => {
     });
 });
 
+/**
+ * Delete channel by ID
+ */
 router.delete("/:id", async (req, res) => {
     let db = new Database(process.env.CONFIG_DB_FILE as string);
     db.run("delete from channels where id = ? ", [req.params.id], function (err) {
@@ -79,6 +91,9 @@ router.delete("/:id", async (req, res) => {
     });
 });
 
+/**
+ * Update channel by ID
+ */
 router.put("/:id", async (req, res) => {
     let valid: Joi.ValidationResult = channels.validate(req.body);
     if (!valid.error) {
@@ -103,6 +118,9 @@ router.put("/:id", async (req, res) => {
     }
 });
 
+/**
+ * Create channel
+ */
 router.post("/", async (req, res) => {
     let valid: Joi.ValidationResult = channels.validate(req.body);
     if (!valid.error) {
