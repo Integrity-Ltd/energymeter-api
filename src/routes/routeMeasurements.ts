@@ -1,13 +1,17 @@
 import { Router } from "express";
-import moment from "moment-timezone";
+import dayjs from "dayjs";
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 import path from "path";
 import { Database } from "sqlite3";
-import DBUtils from "../../../energymeter-utils/src/utils/DBUtils";
+import { runQuery, getMeasurementsFromDBs, getDetails } from "../../../energymeter-utils/src/utils/DBUtils";
 import fs from "fs";
 import report from "../models/report";
 import Joi from "joi";
 
 const router = Router();
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 /**
  * Report measurements
@@ -27,13 +31,13 @@ router.get("/report", async (req, res) => {
 
     const configDB = new Database(process.env.CONFIG_DB_FILE as string);
 
-    let timeZone = moment.tz.guess();
-    const tzone = await DBUtils.runQuery(configDB, "select time_zone from energy_meter where ip_address=? and enabled = 1", [ip]);
+    let timeZone = dayjs.tz.guess();
+    const tzone = await runQuery(configDB, "select time_zone from energy_meter where ip_address=? and enabled = 1", [ip]);
     if (tzone.length > 0) {
         timeZone = tzone[0].time_zone;
     }
-    const fromDate = moment.tz(req.query.fromdate as string, "YYYY-MM-DD", timeZone);
-    const toDate = moment.tz(req.query.todate as string, "YYYY-MM-DD", timeZone);
+    const fromDate = dayjs.tz(req.query.fromdate as string, "YYYY-MM-DD", timeZone);
+    const toDate = dayjs.tz(req.query.todate as string, "YYYY-MM-DD", timeZone);
 
     if (!fromDate.isBefore(toDate)) {
         res.status(400).send({ err: "invalid date range" });
@@ -41,12 +45,12 @@ router.get("/report", async (req, res) => {
     }
 
     let measurements: any[];
-    if (fromDate.get("year") < moment().get("year")) {
+    if (fromDate.get("year") < dayjs().get("year")) {
         measurements = await getYearlyMeasurementsFromDBs(fromDate, toDate, ip, channel);
     } else {
-        measurements = await DBUtils.getMeasurementsFromDBs(fromDate, toDate, ip, channel);
+        measurements = await getMeasurementsFromDBs(fromDate, toDate, ip, channel);
     }
-    let result = DBUtils.getDetails(measurements, timeZone, details, false);
+    let result = getDetails(measurements, timeZone, details, false);
     res.send(result);
 });
 
@@ -59,7 +63,7 @@ router.get("/report", async (req, res) => {
  * @param channel channel of powermeter (use -1 for all)
  * @returns the array of measurements
  */
-async function getYearlyMeasurementsFromDBs(fromDate: moment.Moment, toDate: moment.Moment, ip: string, channel: number): Promise<any[]> {
+async function getYearlyMeasurementsFromDBs(fromDate: dayjs.Dayjs, toDate: dayjs.Dayjs, ip: string, channel: number): Promise<any[]> {
     let result: any[] = [];
     const filePath = (process.env.WORKDIR as string);
     const dbFile = path.join(filePath, ip, fromDate.format("YYYY") + "-yearly.sqlite");
@@ -72,12 +76,12 @@ async function getYearlyMeasurementsFromDBs(fromDate: moment.Moment, toDate: mom
             if (channel) {
                 filters.push(channel);
             }
-            let measurements = await DBUtils.runQuery(db, "select * from measurements where recorded_time between ? and ? " + (channel ? "and channel=?" : "") + " order by recorded_time, channel", filters);
+            let measurements = await runQuery(db, "select * from measurements where recorded_time between ? and ? " + (channel ? "and channel=?" : "") + " order by recorded_time, channel", filters);
             measurements.forEach((element: any) => {
                 result.push(element);
             })
         } catch (err) {
-            console.error(moment().format(), err);
+            console.error(dayjs().format(), err);
         } finally {
             db.close();
         }

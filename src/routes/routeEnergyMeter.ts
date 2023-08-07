@@ -2,10 +2,10 @@ import { Router } from "express";
 import energy_meter from "../models/energy_meter";
 import Joi from "joi";
 import { Database } from "sqlite3";
-import moment from "moment";
+import dayjs from "dayjs";
 import path from "path";
 import fs from "fs";
-import DBUtils from "../../../energymeter-utils/src/utils/DBUtils";
+import { runQuery, getDBFilePath, getMeasurementsFromEnergyMeter } from "../../../energymeter-utils/src/utils/DBUtils";
 const router = Router();
 
 /**
@@ -75,9 +75,9 @@ router.delete("/:id", async (req, res) => {
             db.close();
         } else {
             let path = "";
-            const row = await DBUtils.runQuery(db, "select ip_address from energy_meter where id = ?", [req.params.id]);
+            const row = await runQuery(db, "select ip_address from energy_meter where id = ?", [req.params.id]);
             if (row && row.length > 0) {
-                path = DBUtils.getDBFilePath(row[0].ip_address);
+                path = getDBFilePath(row[0].ip_address);
             }
             db.run("delete from energy_meter where id = ? ", [req.params.id], function (err) {
                 if (err) {
@@ -133,7 +133,7 @@ router.post("/", async (req, res) => {
     let valid: Joi.ValidationResult = energy_meter.validate(req.body);
     if (!valid.error) {
         let db = new Database(process.env.CONFIG_DB_FILE as string);
-        let rows = await DBUtils.runQuery(db, "select * from energy_meter where ip_address=?", [req.body.ip_address]);
+        let rows = await runQuery(db, "select * from energy_meter where ip_address=?", [req.body.ip_address]);
         if (rows && rows.length > 0) {
             res.status(400).send({ message: "Duplicated IP address" });
         } else {
@@ -151,7 +151,7 @@ router.post("/", async (req, res) => {
                         const lastID = this.lastID;
                         let message: any[] = [];
                         message.push({ lastID: lastID });
-                        const insertMoment = moment();
+                        const insertMoment = dayjs();
                         const filePath = (process.env.WORKDIR as string);
                         const subdir = path.join(filePath, req.body.ip_address);
                         if (!fs.existsSync(subdir)) {
@@ -162,19 +162,19 @@ router.post("/", async (req, res) => {
                         try {
                             if (!fs.existsSync(dbFile)) {
                                 measurementsDB = new Database(dbFile);
-                                await DBUtils.runQuery(measurementsDB, `CREATE TABLE "Measurements" ("id" INTEGER NOT NULL,"channel" INTEGER,"measured_value" REAL,"recorded_time" INTEGER, PRIMARY KEY("id" AUTOINCREMENT))`, []);
+                                await runQuery(measurementsDB, `CREATE TABLE "Measurements" ("id" INTEGER NOT NULL,"channel" INTEGER,"measured_value" REAL,"recorded_time" INTEGER, PRIMARY KEY("id" AUTOINCREMENT))`, []);
                             } else {
                                 measurementsDB = new Database(dbFile);
                             }
                             let channels: string[] = [];
                             for (let i: number = 1; i <= 12; i++) {
-                                await DBUtils.runQuery(db, "insert into channels (energy_meter_id, channel, channel_name, enabled) values (?,?,?,?)", [lastID, i, `ch${i}`, true]);
+                                await runQuery(db, "insert into channels (energy_meter_id, channel, channel_name, enabled) values (?,?,?,?)", [lastID, i, `ch${i}`, true]);
                                 channels.push(i.toString())
                             }
                             measurementsDB.close();
-                            await DBUtils.getMeasurementsFromEnergyMeter(moment(), req.body, channels);
+                            await getMeasurementsFromEnergyMeter(dayjs(), req.body, channels);
                         } catch (err) {
-                            console.error(moment().format(), err);
+                            console.error(dayjs().format(), err);
                             if (err) {
                                 message.push({ message: err.toString() });
                             }
