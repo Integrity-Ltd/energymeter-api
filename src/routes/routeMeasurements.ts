@@ -36,8 +36,8 @@ router.get("/report", async (req, res) => {
     if (tzone.length > 0) {
         timeZone = tzone[0].time_zone;
     }
-    const fromDate = dayjs.tz(req.query.fromdate as string, "YYYY-MM-DD", timeZone);
-    const toDate = dayjs.tz(req.query.todate as string, "YYYY-MM-DD", timeZone);
+    const fromDate = dayjs(req.query.fromdate as string, "YYYY-MM-DD");//timeZone
+    const toDate = dayjs(req.query.todate as string, "YYYY-MM-DD");//timeZone
 
     if (!fromDate.isBefore(toDate)) {
         res.status(400).send({ err: "invalid date range" });
